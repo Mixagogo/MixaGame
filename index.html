@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MixaGame</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #1a001a;
+            color: white;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        header {
+            background-color: #4b0082;
+            padding: 20px;
+            font-size: 24px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .menu {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding: 10px;
+            background: #6a0dad;
+            transition: background 0.3s;
+        }
+        .menu a {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        .menu a:hover {
+            color: #ffd700;
+            background: rgba(255, 215, 0, 0.2);
+            transform: scale(1.1) rotate(-5deg);
+        }
+        .game-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 20px;
+            flex: 1;
+        }
+        .game {
+            background: #5a007a;
+            padding: 10px;
+            border-radius: 10px;
+            transition: 0.3s;
+            box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1);
+        }
+        .game:hover {
+            background: #7a00aa;
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(255, 255, 255, 0.2);
+        }
+        .game img {
+            width: 100%;
+            border-radius: 10px;
+        }
+        .game p {
+            color: #ffd700;
+            font-weight: bold;
+        }
+        @media (max-width: 600px) {
+            .menu {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+        footer {
+            background: #4b0082;
+            padding: 20px;
+            text-align: center;
+            margin-top: auto;
+        }
+    </style>
+</head>
+<body>
+    <header>MixaGame</header>
+    <nav class="menu">
+        <a href="#">Головна</a>
+        <a href="#">Ігри</a>
+        <a href="#">Про нас</a>
+        <a href="#">Контакти</a>
+    </nav>
+    <div class="game-container" id="game-list"></div>
+    <footer>
+        <p>&copy; 2025 MixaGame. Всі права захищені.</p>
+    </footer>
+    <script>
+        const games = [
+            { name: "Хрестики нулики 1 гравець", image: "https://via.placeholder.com/200", link: "Tiktoe_bot_hid1.html" },
+            { name: "Гра 2", image: "https://via.placeholder.com/200", link: "" },
+            { name: "Змійка", image: "https://via.placeholder.com/200", link: "" },
+        ];
+
+        const gameList = document.getElementById("game-list");
+        games.forEach(game => {
+            const gameDiv = document.createElement("div");
+            gameDiv.classList.add("game");
+            gameDiv.innerHTML = `
+                <a href="${game.link}">
+                    <img src="${game.image}" alt="${game.name}">
+                    <p>${game.name}</p>
+                </a>
+            `;
+            gameList.appendChild(gameDiv);
+        });
+    </script>
+</body>
+</html>

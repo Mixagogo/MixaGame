@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Хрестики-нулики</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-template-rows: repeat(3, 100px);
+            gap: 5px;
+            margin: 20px auto;
+            width: max-content;
+        }
+
+        .cell {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #fff;
+            border: 2px solid #333;
+            font-size: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .cell.taken {
+            cursor: not-allowed;
+        }
+
+        .winner {
+            color: green;
+            font-size: 1.5rem;
+        }
+
+        .reset-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .reset-btn:hover {
+            background-color: #0056b3;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Гра: Хрестики-нулики</h1>
+    <div class="board" id="board"></div>
+    <p class="winner" id="winner-message"></p>
+    <button class="reset-btn" onclick="resetGame()">Скинути гру</button>
+    <a href="Tiktoe_bot_hid1.html" class="btn">pve</a>
+    <a href="Tiktoe.html" class="btn">pvp</a>
+    <a href="MixaGame.html" class="btn">Назад</a>
+
+    <script>
+        const board = document.getElementById('board');
+        const winnerMessage = document.getElementById('winner-message');
+        let currentPlayer = 'X';
+        let gameBoard = ['', '', '', '', '', '', '', '', ''];
+
+        // Створюємо клітинки
+        function createBoard() {
+            board.innerHTML = '';
+            gameBoard.forEach((cell, index) => {
+                const cellElement = document.createElement('div');
+                cellElement.classList.add('cell');
+                cellElement.dataset.index = index;
+                cellElement.textContent = cell;
+                cellElement.addEventListener('click', () => makeMove(index));
+                board.appendChild(cellElement);
+            });
+        }
+
+        // Виконуємо хід
+        function makeMove(index) {
+            if (gameBoard[index] === '' && !checkWinner()) {
+                gameBoard[index] = currentPlayer;
+                currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+                createBoard();
+                const winner = checkWinner();
+                if (winner) {
+                    winnerMessage.textContent = `Переможець: ${winner}`;
+                } else if (!gameBoard.includes('')) {
+                    winnerMessage.textContent = 'Нічия!';
+                }
+            }
+        }
+
+        // Перевірка переможця
+        function checkWinner() {
+            const winConditions = [
+                [0, 1, 2], [3, 4, 5], [6, 7, 8], // Горизонталі
+                [0, 3, 6], [1, 4, 7], [2, 5, 8], // Вертикалі
+                [0, 4, 8], [2, 4, 6]            // Діагоналі
+            ];
+
+            for (const condition of winConditions) {
+                const [a, b, c] = condition;
+                if (gameBoard[a] && gameBoard[a] === gameBoard[b] && gameBoard[a] === gameBoard[c]) {
+                    return gameBoard[a];
+                }
+            }
+            return null;
+        }
+
+        // Скидання гри
+        function resetGame() {
+            gameBoard = ['', '', '', '', '', '', '', '', ''];
+            currentPlayer = 'X';
+            winnerMessage.textContent = '';
+            createBoard();
+        }
+
+        // Ініціалізація гри
+        createBoard();
+    </script>
+</body>
+</html>

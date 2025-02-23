@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bomb Game</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh; 
+            background-color: white;
+            font-family: Arial, sans-serif;
+        }
+
+        canvas {
+            border: 1px solid black; 
+            background-color: white;
+        }
+
+        #score {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 20px;
+            color: black;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas"></canvas> 
+    <div id="score">Score: 0</div> 
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const FPS = 60;
+        const W = 700;
+        const H = 400;
+        canvas.width = W;
+        canvas.height = H;
+
+        let score = 0;
+        let bomb = false;
+        let x_goal = 0;
+        let y_goal = 0;
+        let y_bomb = H;
+        let r = 30;
+        let x = 0 - r;
+        let y = H / 2;
+
+        const squareSize = 40;
+        let squareX = W / 2 - squareSize / 2;
+        let squareY = H - 40;
+
+        let targetX = Math.random() * (W - 50); 
+        let targetY = Math.random() * (H - 30); 
+        let targetSpeed = 3;
+        let targetWidth = 50;
+        let targetHeight = 30;
+
+        let mouseX = 0;
+        let mouseY = 0;
+
+        function drawCircle(x, y, radius, color) {
+            ctx.beginPath();
+            ctx.arc(x, y, radius, 0, Math.PI * 2, false);
+            ctx.fillStyle = color;
+            ctx.fill();
+        }
+
+        function drawRect(x, y, width, height, color) {
+            ctx.fillStyle = color;
+            ctx.fillRect(x, y, width, height);
+        }
+
+        function drawTarget(x, y, width, height) {
+            ctx.fillStyle = 'blue';
+            ctx.fillRect(x, y, width, height);
+        }
+
+        if (bomb && y_bomb > y_goal) {
+            drawCircle(x_goal, y_bomb, 15, 'black');
+            y_bomb -= 3;
+        }
+
+        canvas.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            mouseX = e.clientX - rect.left;
+            mouseY = e.clientY - rect.top;
+        });
+
+
+        function checkCollision() {
+            return !(squareX + squareSize <= targetX || 
+                    squareX >= targetX + targetWidth || 
+                    squareY + squareSize <= targetY || 
+                    squareY >= targetY + targetHeight);
+        }
+
+        function updateScore() {
+            document.getElementById('score').textContent = `Score: ${score}`;
+        }
+
+        function gameLoop() {
+            ctx.clearRect(0, 0, W, H);
+
+            // Малювання бомби
+            drawCircle(x, y, r, 'orange');
+
+            // Малювання цілі
+            drawTarget(targetX, targetY, targetWidth, targetHeight);
+
+            // Якщо бомба рухається
+            if (bomb && y_bomb > y_goal) {
+                drawCircle(x_goal, y_bomb, 15, 'black');
+                y_bomb -= 3;  // Бомба рухається вниз
+            } else if (bomb && y_bomb <= y_goal) {
+                drawCircle(x_goal, y_bomb, 25, 'red');  // Мітка влучання
+                if (x_goal + 25 >= targetX && x_goal - 25 <= targetX + targetWidth &&
+					y_bomb + 25 >= targetY && y_bomb - 25 <= targetY + targetHeight) {
+					score++;  // Збільшуємо рахунок при влучанні
+					// Можна змінити позицію цілі або виконати інші дії при попаданні
+					targetX = Math.random() * (W - targetWidth);
+					targetY = Math.random() * (H - targetHeight);
+					}
+                bomb = false;  // Скидаємо бомбу
+                y_bomb = H;
+            }
+
+            // Оновлення позиції квадрата за мишкою
+            squareX = mouseX - squareSize / 2;
+
+            // Малювання квадрата
+            drawRect(squareX, squareY, squareSize, squareSize, 'black');
+
+            // Перевірка на попадання
+            if (checkCollision()) {
+                // Збільшення рахунку при попаданні
+                score++;
+                // Нова позиція цілі після влучання
+                targetX = Math.random() * (W - targetWidth); // Випадкова позиція по горизонталі
+                targetY = Math.random() * (H - targetHeight); // Випадкова позиція по вертикалі
+            }
+
+            // Рух цілі
+            targetX += targetSpeed;
+            if (targetX + targetWidth > W || targetX < 0) {
+                targetSpeed = -targetSpeed; // Зміна напрямку руху
+            }
+
+            updateScore();
+        }
+
+        // Оновлення позиції мишки
+        canvas.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            mouseX = e.clientX - rect.left;
+            mouseY = e.clientY - rect.top;
+        });
+
+        // Запуск бомби по кліку
+        canvas.addEventListener('mousedown', (e) => {
+            if (!bomb) {
+                const rect = canvas.getBoundingClientRect();
+                x_goal = e.clientX - rect.left;
+                y_goal = e.clientY - rect.top;
+                bomb = true;
+                y_bomb = H;
+            }
+        });
+
+        function startGame() {
+            setInterval(gameLoop, 1000 / FPS); 
+        }
+
+        startGame();  
+    </script>
+</body>
+</html>
