@@ -7,16 +7,61 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            text-align: center;
-            background-color: #f4f4f4;
             margin: 0;
+            padding: 0;
+            background-color: #1a001a;
+            color: rgb(0, 0, 0);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        header {
+            background-color: #4b0082;
+            padding: 20px;
+            font-size: 24px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .menu {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding: 10px;
+            background: #6a0dad;
+            transition: background 0.3s;
+        }
+        .menu a {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        .menu a:hover {
+            color: #ffd700;
+            background: rgba(255, 215, 0, 0.2);
+            transform: scale(1.1) rotate(-5deg);
+        }
+        .game-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex: 1;
             padding: 20px;
         }
-
-        h1 {
-            color: #333;
+        .game {
+            background: #5a007a;
+            padding: 20px;
+            border-radius: 10px;
+            transition: 0.3s;
+            box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1);
         }
-
+        .game:hover {
+            background: #7a00aa;
+            transform: scale(1.2);
+            box-shadow: 0 6px 12px rgba(255, 255, 255, 0.2);
+        }
         .board {
             display: grid;
             grid-template-columns: repeat(3, 100px);
@@ -25,7 +70,6 @@
             margin: 20px auto;
             width: max-content;
         }
-
         .cell {
             display: flex;
             align-items: center;
@@ -37,13 +81,11 @@
             cursor: pointer;
             user-select: none;
         }
-
         .cell.taken {
             cursor: not-allowed;
         }
-
         .winner {
-            color: green;
+            color: #ffd700;
             font-size: 1.5rem;
         }
 
