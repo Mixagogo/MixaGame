@@ -6,125 +6,134 @@
     <title>Хрестики-нулики</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #1a001a;
-            color: rgb(0, 0, 0);
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
+          font-family: Arial, sans-serif;
+          margin: 0;
+          padding: 0;
+          background-color: #200772;
+          color: rgb(0, 0, 0);
+          text-align: center;
+          display: flex;
+          flex-direction: column;
+          min-height: 100vh;
         }
         header {
-            background-color: #4b0082;
-            padding: 20px;
-            font-size: 24px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+          background-color: #3914AF;
+          padding: 20px;
+          font-size: 24px;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
         .menu {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            padding: 10px;
-            background: #6a0dad;
-            transition: background 0.3s;
+          display: flex;
+          justify-content: center;
+          gap: 20px;
+          padding: 10px;
+          background: #876ED7;
+          transition: background 0.3s;
         }
         .menu a {
-            color: white;
-            text-decoration: none;
-            font-size: 18px;
-            padding: 10px 15px;
-            border-radius: 5px;
-            transition: all 0.3s;
+          color: white;
+          text-decoration: none;
+          font-size: 18px;
+          padding: 10px 15px;
+          border-radius: 5px;
+          transition: all 0.3s;
         }
         .menu a:hover {
-            color: #ffd700;
-            background: rgba(255, 215, 0, 0.2);
-            transform: scale(1.1) rotate(-5deg);
+          color: #ffd700;
+          background: rgba(255, 215, 0, 0.2);
+          transform: scale(1.1) rotate(-5deg);
         }
         .game-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex: 1;
-            padding: 20px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          flex: 1;
+          padding: 20px;
         }
         .game {
-            background: #5a007a;
-            padding: 20px;
-            border-radius: 10px;
-            transition: 0.3s;
-            box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1);
+          background: #6A48D7;
+          padding: 20px;
+          border-radius: 10px;
+          transition: 0.3s;
+          box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1);
         }
         .game:hover {
-            background: #7a00aa;
-            transform: scale(1.2);
-            box-shadow: 0 6px 12px rgba(255, 255, 255, 0.2);
+          background: #7c56fb;
+          transform: scale(1.2);
+          box-shadow: 0 6px 12px rgba(255, 255, 255, 0.2);
         }
         .board {
-            display: grid;
-            grid-template-columns: repeat(3, 100px);
-            grid-template-rows: repeat(3, 100px);
-            gap: 5px;
-            margin: 20px auto;
-            width: max-content;
+          display: grid;
+          grid-template-columns: repeat(3, 100px);
+          grid-template-rows: repeat(3, 100px);
+          gap: 5px;
+          margin: 20px auto;
+          width: max-content;
         }
         .cell {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: #fff;
-            border: 2px solid #333;
-            font-size: 2rem;
-            font-weight: bold;
-            cursor: pointer;
-            user-select: none;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background-color: #fff;
+          border: 2px solid #333;
+          font-size: 2rem;
+          font-weight: bold;
+          cursor: pointer;
+          user-select: none;
         }
         .cell.taken {
-            cursor: not-allowed;
+          cursor: not-allowed;
         }
         .winner {
-            color: #ffd700;
-            font-size: 1.5rem;
+          color: #ffd700;
+          font-size: 1.5rem;
         }
-
         .reset-btn {
-            margin-top: 20px;
-            padding: 10px 20px;
-            background-color: #007BFF;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1rem;
+          margin-top: 20px;
+          padding: 10px 20px;
+          background-color: #007BFF;
+          color: white;
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
+          font-size: 1rem;
         }
-
         .reset-btn:hover {
-            background-color: #0056b3;
+          background-color: #0056b3;
         }
-        .btn {
-            display: inline-block;
-            padding: 10px 20px;
-            background-color: #007BFF;
-            color: #fff;
-            text-decoration: none;
-            border-radius: 5px;
-            font-size: 1rem;
+        .level {
+          margin-top: 10px;
+          font-size: 1.1rem;
+          color: #ffd700;
         }
-        .btn:hover {
-            background-color: #0056b3;
+        footer {
+          background: #4b0082;
+          padding: 20px;
+          text-align: center;
+          margin-top: auto;
         }
-    </style>
+        @media (max-width: 900px) {
+          .game-container {
+            flex-direction: column;
+          }
+        }
+      </style>
 </head>
 <body>
-    <h1>Гра: Хрестики-нулики</h1>
-    <div class="board" id="board"></div>
-    <p class="winner" id="winner-message"></p>
-    <button class="reset-btn" onclick="resetGame()">Скинути гру</button>
-    <a href="Tiktoe_bot_hid1.html" class="btn">pve</a>
-    <a href="Tiktoe.html" class="btn">pvp</a>
-    <a href="index.html" class="btn">Назад</a>
+    <header>
+        Гра: Хрестики-нулики
+    </header>
+    <nav class="menu">
+        <a href="Tiktoe_bot.html">pve</a>
+        <a href="index.html">Назад</a>
+    </nav>
+    <div class="game-container">
+        <div class="game">
+          <div class="board" id="board"></div>
+          <p class="winner" id="winner-message"></p>
+          <button class="reset-btn" onclick="resetGame()">Скинути гру</button>
+        </div>
+    </div>
 
     <script>
         const board = document.getElementById('board');
