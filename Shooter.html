@@ -102,35 +102,24 @@
 
         let score = 0;
         let lives = 10
-        let bomb = false;
-        let x_goal = 0;
-        let y_goal = 0;
-        let y_bomb = H;
-        let r = 30;
-        let x = 0 - r;
-        let y = H / 2;
+        let bombActive = false;
+        let bombX = 0;
+        let bombY = H;
+        let bombRadius = 15;
 
         const squareSize = 40;
         let squareX = W / 2 - squareSize / 2;
         let squareY = H - 40;
 
-        let target1X = Math.random() * (W - 50); 
-        let target1Y = 0;
-        let target2X = Math.random() * (W - 50); 
-        let target2Y = 0;
-        let target3X = Math.random() * (W - 50); 
-        let target3Y = 0;
-        let target1Speed = 1;
-        let target2Speed = 1;
-        let target3Speed = 1;
-
-
+        let targets = [
+            { x: Math.random() * (W - 50), y: 0, speed: 1, color: "blue" },
+            { x: Math.random() * (W - 50), y: 0, speed: 1.5, color: "green" },
+            { x: Math.random() * (W - 50), y: 0, speed: 2, color: "red" }
+        ];
 
         let targetWidth = 30;
         let targetHeight = 50;
-
         let mouseX = 0;
-        let mouseY = 0;
 
         function getRandomNumber(min, max) {
             return Math.random() * (max - min) + min;
@@ -148,31 +137,36 @@
             ctx.fillRect(x, y, width, height);
         }
 
-        function drawTarget1(x, y, width, height, color) {
-            ctx.fillStyle = color;
-            ctx.fillRect(x, y, width, height);
+        function checkBombCollision() {
+            for (let i = 0; i < targets.length; i++) {
+                let targetnum = targets[i];
+                if (
+                    bombX + bombRadius >= targetnum.x &&
+                    bombX - bombRadius <= targetnum.x + targetWidth &&
+                    bombY + bombRadius >= targetnum.y &&
+                    bombY - bombRadius <= targetnum.y + targetHeight
+                ) {
+                    score++;
+                    explodeBomb(bombX, bombY);
+                    resetTarget(i);
+                    bombActive = false;
+                    return;
+                }
+            }
         }
 
-        function drawTarget2(x, y, width, height, color) {
-            ctx.fillStyle = color;
-            ctx.fillRect(x, y, width, height);
+        function explodeBomb(x, y) {
+            drawCircle(x, y, 30, 'red');
+            setTimeout(() => {
+                ctx.clearRect(x - 30, y - 30, 60, 60);
+            }, 200);
         }
 
-        function drawTarget3(x, y, width, height, color) {
-            ctx.fillStyle = color;
-            ctx.fillRect(x, y, width, height);
+        function resetTarget(index) {
+            targets[index].x = Math.random() * (W - targetWidth);
+            targets[index].y = 0;
+            targets[index].speed = getRandomNumber(1, 3);
         }
-
-        if (bomb && y_bomb > y_goal) {
-            drawCircle(x_goal, y_bomb, 15, 'black');
-            y_bomb -= 10;
-        }
-
-        canvas.addEventListener('mousemove', (e) => {
-            const rect = canvas.getBoundingClientRect();
-            mouseX = e.clientX - rect.left;
-            mouseY = e.clientY - rect.top;
-        });
 
         function updateScore() {
             document.getElementById('score').textContent = `Score: ${score}`;
@@ -182,110 +176,59 @@
         function gameLoop() {
             ctx.clearRect(0, 0, W, H);
 
-            // Малювання бомби
-            drawCircle(x, y, r, 'orange');
+            targets.forEach(target => {
+                drawRect(target.x, target.y, targetWidth, targetHeight, target.color);
+                target.y += target.speed;
 
-            // Малювання цілі
-            drawTarget1(target1X, target1Y, targetWidth, targetHeight, 'blue');
+                if (target.y + targetHeight > H) {
+                    target.y = 0;
+                    lives--;
+                }
+            });
 
-            drawTarget2(target2X, target2Y, targetWidth, targetHeight, 'green');
+            if (bombActive) {
+                drawCircle(bombX, bombY, bombRadius, 'black');
+                bombY -= 10;
+                checkBombCollision();
 
-            drawTarget3(target3X, target3Y, targetWidth, targetHeight, 'red');
-
-            // Якщо бомба рухається
-            if (bomb && y_bomb > y_goal) {
-                drawCircle(x_goal, y_bomb, 15, 'black');
-                y_bomb -= 10;  // Бомба рухається вниз
-            } else if (bomb && y_bomb <= y_goal) {
-                drawCircle(x_goal, y_bomb, 25, 'red');  // Мітка влучання
-                if (x_goal + 25 >= target1X && x_goal - 25 <= target1X + targetWidth &&
-					y_bomb + 25 >= target1Y && y_bomb - 25 <= target1Y + targetHeight) {
-					score++;  
-					// Можна змінити позицію цілі або виконати інші дії при попаданні
-					target1X = Math.random() * (W - targetWidth);
-					target1Speed = getRandomNumber(1,3);
-                    target1Y = 0
-					}
-                if (x_goal + 25 >= target2X && x_goal - 25 <= target2X + targetWidth &&
-					y_bomb + 25 >= target2Y && y_bomb - 25 <= target2Y + targetHeight) {
-					score++;  
-					// Можна змінити позицію цілі або виконати інші дії при попаданні
-					target2X = Math.random() * (W - targetWidth);
-					target2Speed = getRandomNumber(1,3);
-                    target2Y = 0
-					}
-                if (x_goal + 25 >= target3X && x_goal - 25 <= target3X + targetWidth &&
-					y_bomb + 25 >= target3Y && y_bomb - 25 <= target3Y + targetHeight) {
-					score++;  
-					// Можна змінити позицію цілі або виконати інші дії при попаданні
-					target3X = Math.random() * (W - targetWidth);
-					target3Speed = getRandomNumber(1,3);
-                    target3Y = 0
-					}
-                bomb = false;  // Скидаємо бомбу
-                y_bomb = H;
+                if (bombY <= 0) {
+                    bombActive = false;
+                }
             }
 
-            // Оновлення позиції квадрата за мишкою
-            squareX = mouseX - squareSize / 2;
-
-            // Малювання квадрата
             drawRect(squareX, squareY, squareSize, squareSize, 'black');
 
-            // Рух цілі
-            target1Y += target1Speed;
-            if (target1Y + targetHeight > H) {
-                target1Y = 0; 
-                lives -= 1
-            }
-
-            target2Y += target2Speed;
-            if (target2Y + targetHeight > H) {
-                target2Y = 0; 
-                lives -= 1
-            }
-
-            target3Y += target3Speed;
-            if (target3Y + targetHeight > H) {
-                target3Y = 0; 
-                lives -= 1
-            }
-
-            if (lives <= 0){
-                score = 0
-                lives = 10
-                target1Y = 0
-                target2Y = 0
-                target3Y = 0
-                alert("Ви програли")
+            if (lives <= 0) {
+                alert("Ви програли!");
+                score = 0;
+                lives = 10;
+                targets.forEach((_, i) => resetTarget(i));
             }
 
             updateScore();
         }
 
-        // Оновлення позиції мишки
         canvas.addEventListener('mousemove', (e) => {
             const rect = canvas.getBoundingClientRect();
             mouseX = e.clientX - rect.left;
-            mouseY = e.clientY - rect.top;
+            squareX = mouseX - squareSize / 2;
         });
 
-        // Запуск бомби по кліку
         canvas.addEventListener('mousedown', (e) => {
-            if (!bomb) {
+            if (!bombActive) {
                 const rect = canvas.getBoundingClientRect();
-                x_goal = e.clientX - rect.left;
-                y_goal = e.clientY - rect.top;
-                bomb = true;
-                y_bomb = H;
+                bombX = e.clientX - rect.left;
+                bombY = H;
+                bombActive = true;
             }
         });
 
+
         function startGame() {
-            setInterval(gameLoop, 1000 / FPS); 
+            setInterval(gameLoop, 1000 / FPS);
         }
 
-        startGame();  
+        startGame(); 
     </script>
 </body>
     
