@@ -59,6 +59,13 @@
             font-size: 20px;
             color: white;
         }
+        #lives {
+            position: absolute;
+            top: 30px;
+            left: 10px;
+            font-size: 20px;
+            color: white;
+        }
         .btn {
             margin-top: 20px;
             padding: 10px 20px;
@@ -82,7 +89,8 @@
         </nav>
     </header>
     <canvas id="gameCanvas"></canvas> 
-    <div id="score">Score: 0</div> 
+    <div id="score">Score: 0</div>
+    <div id="lives">Lives: 10</div> 
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
@@ -93,6 +101,7 @@
         canvas.height = H;
 
         let score = 0;
+        let lives = 10
         let bomb = false;
         let x_goal = 0;
         let y_goal = 0;
@@ -106,10 +115,10 @@
         let squareY = H - 40;
 
         let targetX = Math.random() * (W - 50); 
-        let targetY = Math.random() * (H - 30); 
+        let targetY = 0; 
         let targetSpeed = 3;
-        let targetWidth = 50;
-        let targetHeight = 30;
+        let targetWidth = 30;
+        let targetHeight = 50;
 
         let mouseX = 0;
         let mouseY = 0;
@@ -133,7 +142,7 @@
 
         if (bomb && y_bomb > y_goal) {
             drawCircle(x_goal, y_bomb, 15, 'black');
-            y_bomb -= 3;
+            y_bomb -= 10;
         }
 
         canvas.addEventListener('mousemove', (e) => {
@@ -152,6 +161,7 @@
 
         function updateScore() {
             document.getElementById('score').textContent = `Score: ${score}`;
+            document.getElementById('lives').textContent = `Lives: ${lives}`;
         }
 
         function gameLoop() {
@@ -166,15 +176,16 @@
             // Якщо бомба рухається
             if (bomb && y_bomb > y_goal) {
                 drawCircle(x_goal, y_bomb, 15, 'black');
-                y_bomb -= 3;  // Бомба рухається вниз
+                y_bomb -= 10;  // Бомба рухається вниз
             } else if (bomb && y_bomb <= y_goal) {
                 drawCircle(x_goal, y_bomb, 25, 'red');  // Мітка влучання
                 if (x_goal + 25 >= targetX && x_goal - 25 <= targetX + targetWidth &&
 					y_bomb + 25 >= targetY && y_bomb - 25 <= targetY + targetHeight) {
-					score++;  // Збільшуємо рахунок при влучанні
+					score++;  
 					// Можна змінити позицію цілі або виконати інші дії при попаданні
 					targetX = Math.random() * (W - targetWidth);
-					targetY = Math.random() * (H - targetHeight);
+					targetSpeed = Math.floor(Math.random() * 5);
+                    targetY = 0
 					}
                 bomb = false;  // Скидаємо бомбу
                 y_bomb = H;
@@ -188,17 +199,23 @@
 
             // Перевірка на попадання
             if (checkCollision()) {
-                // Збільшення рахунку при попаданні
-                score++;
-                // Нова позиція цілі після влучання
+                lives -= 2
+                targetY = 0
                 targetX = Math.random() * (W - targetWidth); // Випадкова позиція по горизонталі
-                targetY = Math.random() * (H - targetHeight); // Випадкова позиція по вертикалі
+                targetSpeed = Math.floor(Math.random() * 5); // Випадкова швидкість
             }
 
             // Рух цілі
-            targetX += targetSpeed;
-            if (targetX + targetWidth > W || targetX < 0) {
-                targetSpeed = -targetSpeed; // Зміна напрямку руху
+            targetY += targetSpeed;
+            if (targetY + targetHeight > H) {
+                targetY = 0; 
+                lives -= 1
+            }
+
+            if (lives <= 0){
+                score = 0
+                lives = 10
+                alert("Ви програли")
             }
 
             updateScore();
