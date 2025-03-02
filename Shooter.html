@@ -120,9 +120,9 @@
         let target2Y = 0;
         let target3X = Math.random() * (W - 50); 
         let target3Y = 0;
-        let target1Speed = 0.1;
-        let target2Speed = 0.1;
-        let target3Speed = 0.1;
+        let target1Speed = 1;
+        let target2Speed = 1;
+        let target3Speed = 1;
 
 
 
@@ -203,7 +203,7 @@
 					score++;  
 					// Можна змінити позицію цілі або виконати інші дії при попаданні
 					target1X = Math.random() * (W - targetWidth);
-					target1Speed = getRandomNumber(2,6);
+					target1Speed = getRandomNumber(1,3);
                     target1Y = 0
 					}
                 if (x_goal + 25 >= target2X && x_goal - 25 <= target2X + targetWidth &&
@@ -211,7 +211,7 @@
 					score++;  
 					// Можна змінити позицію цілі або виконати інші дії при попаданні
 					target2X = Math.random() * (W - targetWidth);
-					target2Speed = getRandomNumber(2,6);
+					target2Speed = getRandomNumber(1,3);
                     target2Y = 0
 					}
                 if (x_goal + 25 >= target3X && x_goal - 25 <= target3X + targetWidth &&
