@@ -114,14 +114,27 @@
         let squareX = W / 2 - squareSize / 2;
         let squareY = H - 40;
 
-        let targetX = Math.random() * (W - 50); 
-        let targetY = 0; 
-        let targetSpeed = 3;
+        let target1X = Math.random() * (W - 50); 
+        let target1Y = 0;
+        let target2X = Math.random() * (W - 50); 
+        let target2Y = 0;
+        let target3X = Math.random() * (W - 50); 
+        let target3Y = 0;
+        let target1Speed = 0.1;
+        let target2Speed = 0.1;
+        let target3Speed = 0.1;
+
+
+
         let targetWidth = 30;
         let targetHeight = 50;
 
         let mouseX = 0;
         let mouseY = 0;
+
+        function getRandomNumber(min, max) {
+            return Math.random() * (max - min) + min;
+        }
 
         function drawCircle(x, y, radius, color) {
             ctx.beginPath();
@@ -135,8 +148,18 @@
             ctx.fillRect(x, y, width, height);
         }
 
-        function drawTarget(x, y, width, height) {
-            ctx.fillStyle = 'blue';
+        function drawTarget1(x, y, width, height, color) {
+            ctx.fillStyle = color;
+            ctx.fillRect(x, y, width, height);
+        }
+
+        function drawTarget2(x, y, width, height, color) {
+            ctx.fillStyle = color;
+            ctx.fillRect(x, y, width, height);
+        }
+
+        function drawTarget3(x, y, width, height, color) {
+            ctx.fillStyle = color;
             ctx.fillRect(x, y, width, height);
         }
 
@@ -151,14 +174,6 @@
             mouseY = e.clientY - rect.top;
         });
 
-
-        function checkCollision() {
-            return !(squareX + squareSize <= targetX || 
-                    squareX >= targetX + targetWidth || 
-                    squareY + squareSize <= targetY || 
-                    squareY >= targetY + targetHeight);
-        }
-
         function updateScore() {
             document.getElementById('score').textContent = `Score: ${score}`;
             document.getElementById('lives').textContent = `Lives: ${lives}`;
@@ -171,7 +186,11 @@
             drawCircle(x, y, r, 'orange');
 
             // Малювання цілі
-            drawTarget(targetX, targetY, targetWidth, targetHeight);
+            drawTarget1(target1X, target1Y, targetWidth, targetHeight, 'blue');
+
+            drawTarget2(target2X, target2Y, targetWidth, targetHeight, 'green');
+
+            drawTarget3(target3X, target3Y, targetWidth, targetHeight, 'red');
 
             // Якщо бомба рухається
             if (bomb && y_bomb > y_goal) {
@@ -179,13 +198,29 @@
                 y_bomb -= 10;  // Бомба рухається вниз
             } else if (bomb && y_bomb <= y_goal) {
                 drawCircle(x_goal, y_bomb, 25, 'red');  // Мітка влучання
-                if (x_goal + 25 >= targetX && x_goal - 25 <= targetX + targetWidth &&
-					y_bomb + 25 >= targetY && y_bomb - 25 <= targetY + targetHeight) {
+                if (x_goal + 25 >= target1X && x_goal - 25 <= target1X + targetWidth &&
+					y_bomb + 25 >= target1Y && y_bomb - 25 <= target1Y + targetHeight) {
 					score++;  
 					// Можна змінити позицію цілі або виконати інші дії при попаданні
-					targetX = Math.random() * (W - targetWidth);
-					targetSpeed = Math.floor(Math.random() * 5);
-                    targetY = 0
+					target1X = Math.random() * (W - targetWidth);
+					target1Speed = getRandomNumber(2,6);
+                    target1Y = 0
+					}
+                if (x_goal + 25 >= target2X && x_goal - 25 <= target2X + targetWidth &&
+					y_bomb + 25 >= target2Y && y_bomb - 25 <= target2Y + targetHeight) {
+					score++;  
+					// Можна змінити позицію цілі або виконати інші дії при попаданні
+					target2X = Math.random() * (W - targetWidth);
+					target2Speed = getRandomNumber(2,6);
+                    target2Y = 0
+					}
+                if (x_goal + 25 >= target3X && x_goal - 25 <= target3X + targetWidth &&
+					y_bomb + 25 >= target3Y && y_bomb - 25 <= target3Y + targetHeight) {
+					score++;  
+					// Можна змінити позицію цілі або виконати інші дії при попаданні
+					target3X = Math.random() * (W - targetWidth);
+					target3Speed = getRandomNumber(1,3);
+                    target3Y = 0
 					}
                 bomb = false;  // Скидаємо бомбу
                 y_bomb = H;
@@ -197,24 +232,31 @@
             // Малювання квадрата
             drawRect(squareX, squareY, squareSize, squareSize, 'black');
 
-            // Перевірка на попадання
-            if (checkCollision()) {
-                lives -= 2
-                targetY = 0
-                targetX = Math.random() * (W - targetWidth); // Випадкова позиція по горизонталі
-                targetSpeed = Math.floor(Math.random() * 5); // Випадкова швидкість
+            // Рух цілі
+            target1Y += target1Speed;
+            if (target1Y + targetHeight > H) {
+                target1Y = 0; 
+                lives -= 1
             }
 
-            // Рух цілі
-            targetY += targetSpeed;
-            if (targetY + targetHeight > H) {
-                targetY = 0; 
+            target2Y += target2Speed;
+            if (target2Y + targetHeight > H) {
+                target2Y = 0; 
+                lives -= 1
+            }
+
+            target3Y += target3Speed;
+            if (target3Y + targetHeight > H) {
+                target3Y = 0; 
                 lives -= 1
             }
 
             if (lives <= 0){
                 score = 0
                 lives = 10
+                target1Y = 0
+                target2Y = 0
+                target3Y = 0
                 alert("Ви програли")
             }
 
