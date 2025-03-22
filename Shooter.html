@@ -165,7 +165,16 @@
         function resetTarget(index) {
             targets[index].x = Math.random() * (W - targetWidth);
             targets[index].y = 0;
-            targets[index].speed = getRandomNumber(2, 5);
+            if (score < 15){
+                targets[index].speed = getRandomNumber(2, 4);
+            }
+            else if (score > 30 && score < 75){
+                targets[index].speed = getRandomNumber(4, 6);
+            }
+            else{
+                targets[index].speed = getRandomNumber(6, 8);
+            }
+            
         }
 
         function updateScore() {
