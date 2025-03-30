@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Динозаврик Гра</title>
+    <style>
+        body {
+            text-align: center;
+            background-color: #f4f4f4;
+        }
+        canvas {
+            background-color: white;
+            border: 2px solid black;
+        }
+    </style>
+</head>
+<body>
+    <h1>Гра: Динозаврик</h1>
+    <canvas id="gameCanvas" width="800" height="300"></canvas>
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+        
+        let dino = { x: 50, y: 200, width: 40, height: 50, vy: 0, jumping: false, ducking: false, speed: 5 };
+        let gravity = 0.5;
+        let obstacles = [];
+        let groundY = 250; // Місце, де знаходиться статичне зелене поле
+        let frame = 0;
+        let score = 0;
+        let gameOver = false;
+
+        function drawDino() {
+            ctx.fillStyle = "#555";
+            if (dino.ducking) {
+                ctx.fillRect(dino.x, dino.y + 20, dino.width, 30); // Присівший динозаврик
+                
+                // Голова при присіданні
+                ctx.beginPath();
+                ctx.arc(dino.x + 30, dino.y + 35, 10, 0, Math.PI * 2);
+                ctx.fillStyle = "#555";
+                ctx.fill();
+            } else {
+                ctx.fillRect(dino.x, dino.y, dino.width, dino.height); // Тіло динозаврика
+                
+                // Голова
+                ctx.beginPath();
+                ctx.arc(dino.x + 30, dino.y + 10, 10, 0, Math.PI * 2);
+                ctx.fillStyle = "#555";
+                ctx.fill();
+            }
+            
+            // Очко
+            ctx.beginPath();
+            ctx.arc(dino.x + 33, dino.ducking ? dino.y + 33 : dino.y + 8, 3, 0, Math.PI * 2);
+            ctx.fillStyle = "white";
+            ctx.fill();
+            
+            // Ноги
+            ctx.fillStyle = "#333";
+            ctx.fillRect(dino.x + 5, dino.y + (dino.ducking ? 35 : 45), 10, 10);
+            ctx.fillRect(dino.x + 25, dino.y + (dino.ducking ? 35 : 45), 10, 10);
+        }
+
+        // Обробка натискання клавіш
+        document.addEventListener("keydown", (e) => {
+            if (e.code === "ArrowUp" && !dino.jumping) {
+                dino.vy = -15;
+                dino.jumping = true;
+            }
+            if (e.code === "ArrowDown") {
+                dino.ducking = true;
+            }
+            if (e.code === "ArrowLeft") {
+                dino.x -= dino.speed; // Рух вліво
+            }
+            if (e.code === "ArrowRight") {
+                dino.x += dino.speed; // Рух вправо
+            }
+        });
+        
+        document.addEventListener("keyup", (e) => {
+            if (e.code === "ArrowDown") {
+                dino.ducking = false;
+            }
+        });
+        
+        // Оновлення ігрових об'єктів
+        function update() {
+            if (gameOver) return;
+            
+            dino.y += dino.vy;
+            dino.vy += gravity;
+            if (dino.y >= 200) {
+                dino.y = 200;
+                dino.jumping = false;
+            }
+            
+            // Перешкоди: кожні 100 кадрів додається нова перешкода
+            if (frame % 100 === 0) {
+                let type = Math.random() < 0.5 ? "ground" : "air";
+                
+                obstacles.push({
+                    x: 800, 
+                    y: type === "ground" ? 220 : 190, // Повітряні перешкоди йдуть на висоті 190
+                    width: 30, 
+                    height: type === "ground" ? 30 : 20, 
+                    type
+                });
+            }
+            
+            // Перевірка на зіткнення з перешкодами
+            obstacles.forEach((obs, i) => {
+                obs.x -= 5;
+                if (obs.x + obs.width < 0) {
+                    obstacles.splice(i, 1);
+                    score++; // Збільшуємо рахунок при проходженні перешкоди
+                }
+                
+                // Перевірка на зіткнення динозаврика з перешкодою
+                if (dino.x < obs.x + obs.width && dino.x + dino.width > obs.x &&
+                    dino.y < obs.y + obs.height && dino.y + dino.height > obs.y) {
+                    
+                    // Якщо динозаврик присідає, то не реєструємо зіткнення з повітряними перешкодами
+                    if (dino.ducking && obs.type === "air") {
+                        return; // Пропускаємо обробку для зіткнення з повітряною перешкодою
+                    }
+
+                    gameOver = true; // Якщо є зіткнення, гра завершується
+                }
+            });
+            
+            frame++;
+        }
+        
+        // Малювання елементів гри
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Малюємо статичне зелене поле
+            ctx.fillStyle = "green";
+            ctx.fillRect(0, groundY, canvas.width, 50);
+
+            drawDino()
+            
+            // Малюємо перешкоди
+            obstacles.forEach(obs => {
+                ctx.fillStyle = obs.type === "ground" ? "red" : "blue";
+                ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
+            });
+            
+            ctx.fillStyle = "black";
+            ctx.fillText("Score: " + score, 10, 20);
+            
+            // Якщо гра завершена, виводимо повідомлення
+            if (gameOver) {
+                ctx.fillText("Game Over! Press F5 to Restart", 300, 150);
+            }
+        }
+        
+        // Основний цикл гри
+        function loop() {
+            update();
+            draw();
+            requestAnimationFrame(loop);
+        }
+        
+        loop();
+    </script>
+</body>
+</html>
