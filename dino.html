@@ -23,14 +23,15 @@
         const ctx = canvas.getContext("2d");
 
         let dino = { x: 50, y: 200, width: 40, height: 50, vy: 0, jumping: false, ducking: false, speed: 8 }; // Швидкість speed: 5
-        let gravity = 0.030; // Збільшуємо значення для більш швидкого падіння
+        let gravity = 0.16; // Збільшуємо значення для більш швидкого падіння
         let obstacles = [];
         let groundY = 250;
         let frame = 0;
-        let score = 0;
+        let score = 49;
         let gameOver = false;
         let lastTime = 0; // Час останнього кадру
-		let obstacleSpeed = 0.2; // Початкова швидкість перешкод
+		let obstacleSpeed = 0.25; // Початкова швидкість перешкод
+        let obstacleSpawnSpeed = 100; 
 
         function drawDino() {
             ctx.fillStyle = "#555";
@@ -67,7 +68,7 @@
         // Обробка натискання клавіш
         document.addEventListener("keydown", (e) => {
             if (e.code === "ArrowUp" && !dino.jumping) {
-                dino.vy = -2; // Змінюємо на більший або менший, залежно від бажаної висоти стрибка
+                dino.vy = -4; // Змінюємо на більший або менший, залежно від бажаної висоти стрибка
                 dino.jumping = true;
             }
             if (e.code === "ArrowDown") {
@@ -92,8 +93,8 @@
                 dino.jumping = false;
             }
 
-            // Перешкоди: кожні 100 кадрів додається нова перешкода
-            if (frame % 200 === 0) {
+            // Перешкоди: кожні obstacleSpawnSpeed кадрів додається нова перешкода
+            if (frame % obstacleSpawnSpeed === 0) {
                 let type = Math.random() < 0.5 ? "ground" : "air";
                 
                 obstacles.push({
@@ -107,22 +108,24 @@
 			
             // Збільшення швидкості перешкод кожні 10 балів
             if (score == 10) {
-                obstacleSpeed = 0.25;
+                obstacleSpeed = 0.3;
+                obstacleSpawnSpeed = 100
             }
             if (score == 20) {
-                obstacleSpeed = 0.3;
+                obstacleSpeed = 0.35;
+                obstacleSpawnSpeed = 90
             }
             if (score == 30) {
-                obstacleSpeed = 0.35;
+                obstacleSpeed = 0.4;
+                obstacleSpawnSpeed = 80
             }
             if (score == 40) {
-                obstacleSpeed = 0.40;
+                obstacleSpeed = 0.45;
+                obstacleSpawnSpeed = 70
             }
             if (score == 50) {
-                obstacleSpeed = 0.45;
-            }
-            if (score == 60) {
-                obstacleSpeed = 0.50;
+                obstacleSpeed = 0.5;
+                obstacleSpawnSpeed = 60
             }
 			
             // Перевірка на зіткнення з перешкодами
@@ -167,7 +170,7 @@
             
             ctx.fillStyle = "black";
             ctx.fillText("Score: " + score, 10, 20);
-			ctx.fillText("Speed: " + obstacleSpeed, 10, 40);
+			/* ctx.fillText("Speed: " + obstacleSpeed, 10, 40); */
             
             // Якщо гра завершена, виводимо повідомлення
             if (gameOver) {
