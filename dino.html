@@ -21,14 +21,16 @@
     <script>
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
-        
-        let dino = { x: 50, y: 200, width: 40, height: 50, vy: 0, jumping: false, ducking: false, speed: 5 };
-        let gravity = 0.5;
+
+        let dino = { x: 50, y: 200, width: 40, height: 50, vy: 0, jumping: false, ducking: false, speed: 8 }; // Швидкість speed: 5
+        let gravity = 0.030; // Збільшуємо значення для більш швидкого падіння
         let obstacles = [];
-        let groundY = 250; // Місце, де знаходиться статичне зелене поле
+        let groundY = 250;
         let frame = 0;
         let score = 0;
         let gameOver = false;
+        let lastTime = 0; // Час останнього кадру
+		let obstacleSpeed = 0.2; // Початкова швидкість перешкод
 
         function drawDino() {
             ctx.fillStyle = "#555";
@@ -65,17 +67,11 @@
         // Обробка натискання клавіш
         document.addEventListener("keydown", (e) => {
             if (e.code === "ArrowUp" && !dino.jumping) {
-                dino.vy = -15;
+                dino.vy = -2; // Змінюємо на більший або менший, залежно від бажаної висоти стрибка
                 dino.jumping = true;
             }
             if (e.code === "ArrowDown") {
                 dino.ducking = true;
-            }
-            if (e.code === "ArrowLeft") {
-                dino.x -= dino.speed; // Рух вліво
-            }
-            if (e.code === "ArrowRight") {
-                dino.x += dino.speed; // Рух вправо
             }
         });
         
@@ -86,18 +82,18 @@
         });
         
         // Оновлення ігрових об'єктів
-        function update() {
+        function update(deltaTime) {
             if (gameOver) return;
-            
+
             dino.y += dino.vy;
             dino.vy += gravity;
             if (dino.y >= 200) {
                 dino.y = 200;
                 dino.jumping = false;
             }
-            
+
             // Перешкоди: кожні 100 кадрів додається нова перешкода
-            if (frame % 100 === 0) {
+            if (frame % 200 === 0) {
                 let type = Math.random() < 0.5 ? "ground" : "air";
                 
                 obstacles.push({
@@ -108,10 +104,30 @@
                     type
                 });
             }
-            
+			
+            // Збільшення швидкості перешкод кожні 10 балів
+            if (score == 10) {
+                obstacleSpeed = 0.25;
+            }
+            if (score == 20) {
+                obstacleSpeed = 0.3;
+            }
+            if (score == 30) {
+                obstacleSpeed = 0.35;
+            }
+            if (score == 40) {
+                obstacleSpeed = 0.40;
+            }
+            if (score == 50) {
+                obstacleSpeed = 0.45;
+            }
+            if (score == 60) {
+                obstacleSpeed = 0.50;
+            }
+			
             // Перевірка на зіткнення з перешкодами
             obstacles.forEach((obs, i) => {
-                obs.x -= 5;
+                obs.x -= obstacleSpeed * deltaTime; // Рух перешкод залежить від часу. Якщо ви хочете, щоб перешкоди рухались швидше, можна збільшити значення множника obstacleSpeed наприклад, замінити 0.2 на 0.3 або більше.
                 if (obs.x + obs.width < 0) {
                     obstacles.splice(i, 1);
                     score++; // Збільшуємо рахунок при проходженні перешкоди
@@ -151,6 +167,7 @@
             
             ctx.fillStyle = "black";
             ctx.fillText("Score: " + score, 10, 20);
+			ctx.fillText("Speed: " + obstacleSpeed, 10, 40);
             
             // Якщо гра завершена, виводимо повідомлення
             if (gameOver) {
@@ -158,10 +175,14 @@
             }
         }
         
-        // Основний цикл гри
-        function loop() {
-            update();
-            draw();
+        // Основний цикл гри з обробкою часу
+        function loop(timestamp) {
+            if (lastTime) {
+                const deltaTime = timestamp - lastTime;
+                update(deltaTime);
+                draw();
+            }
+            lastTime = timestamp;
             requestAnimationFrame(loop);
         }
         
